@@ -1,0 +1,9 @@
+allprojects {
+    afterEvaluate { project ->
+        if (project.name == 'app_links') {
+            project.android {
+                compileSdkVersion 33
+            }
+        }
+    }
+}
