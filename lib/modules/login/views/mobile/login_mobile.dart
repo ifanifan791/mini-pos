@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/login_form.dart';
+import '../../widgets/login_form.dart';
 
 class LoginMobile extends StatelessWidget {
   const LoginMobile({super.key});

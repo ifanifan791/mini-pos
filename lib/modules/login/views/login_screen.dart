@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/responsive_layout.dart';
-import 'login_mobile.dart';
-import 'login_tablet.dart';
+import 'mobile/login_mobile.dart';
+import 'tablet/login_tablet.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});

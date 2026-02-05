@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'register_tablet.dart';
+import '../../../../dummies/login_dummy.dart'; 
+import '../../../kasir/views/kasir_tablet_view.dart';
 
 class LoginTablet extends StatefulWidget {
   const LoginTablet({super.key});
@@ -9,13 +11,41 @@ class LoginTablet extends StatefulWidget {
 }
 
 class _LoginTabletState extends State<LoginTablet> {
+  // Controller untuk menangkap input user
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   // 0: Awal, 1: Form Login, 2: Form Registrasi Toko, 3: Form Registrasi Karyawan
   int _viewState = 0;
+
+  // Fungsi validasi login menggunakan dummy data
+  void _handleLogin() {
+    String username = _usernameController.text;
+    String password = _passwordController.text;
+
+    String? role = LoginDummy.validate(username, password);
+
+    if (role != null) {
+      // Jika berhasil, arahkan ke halaman Kasir
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const KasirTabletView()),
+      );
+    } else {
+      // Jika gagal, tampilkan pesan kesalahan
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Username atau Password salah!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   void _showRoleSelection() {
     showDialog(
       context: context,
-      barrierColor: Colors.black45, // Background luar jadi gelap transparan
+      barrierColor: Colors.black45,
       builder: (context) => Align(
         alignment: Alignment.bottomCenter,
         child: Material(
@@ -53,7 +83,6 @@ class _LoginTabletState extends State<LoginTablet> {
     return Scaffold(
       body: Row(
         children: [
-          // SISI KIRI: Gambar Pasar (Statis)
           Expanded(
             flex: 1,
             child: Container(
@@ -65,7 +94,6 @@ class _LoginTabletState extends State<LoginTablet> {
               ),
             ),
           ),
-          // SISI KANAN: Area Putih
           Expanded(
             flex: 1,
             child: Container(
@@ -81,7 +109,6 @@ class _LoginTabletState extends State<LoginTablet> {
   Widget _buildDynamicContent() {
     if (_viewState == 0) return _buildInitialView();
     
-    // Header Back Button untuk Form
     return Column(
       children: [
         Container(
@@ -131,8 +158,9 @@ class _LoginTabletState extends State<LoginTablet> {
         children: [
           const AppLogoWidget(),
           const SizedBox(height: 40),
-          _inputField("Username"),
-          _inputField("Password", isPassword: true),
+          // Menggunakan controller yang sudah dibuat
+          _inputField("Username", controller: _usernameController),
+          _inputField("Password", controller: _passwordController, isPassword: true),
           Row(
             children: [
               Checkbox(value: false, onChanged: (v) {}),
@@ -140,13 +168,13 @@ class _LoginTabletState extends State<LoginTablet> {
             ],
           ),
           const SizedBox(height: 30),
-          _largeButton("MASUK", const Color(0xFF3498db), Colors.white, () {}),
+          // Tombol masuk menjalankan fungsi validasi
+          _largeButton("MASUK", const Color(0xFF3498db), Colors.white, _handleLogin),
         ],
       ),
     );
   }
 
-  // --- Widget Helpers ---
   Widget _largeButton(String label, Color bg, Color text, VoidCallback onTap, {bool isOutline = false}) {
     return SizedBox(
       width: double.infinity,
@@ -184,10 +212,12 @@ class _LoginTabletState extends State<LoginTablet> {
     );
   }
 
-  Widget _inputField(String hint, {bool isPassword = false}) {
+  // Update inputField agar menerima controller
+  Widget _inputField(String hint, {required TextEditingController controller, bool isPassword = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: TextField(
+        controller: controller,
         obscureText: isPassword,
         decoration: InputDecoration(
           hintText: hint,
@@ -205,7 +235,6 @@ class AppLogoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Logo persis gambar mockup
         Image.network('https://i.ibb.co/L6Z4XqQ/epos-logo.png', height: 150, errorBuilder: (c, e, s) => const CircleAvatar(radius: 60, child: Text("E"))),
         const Text("EPOS", style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, letterSpacing: 5)),
       ],
